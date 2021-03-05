@@ -1,15 +1,23 @@
 let redCounterSteps = 0;
-let redBallOp = false;
 
 function getDOM(id) {
     return document.getElementById(id);
 }
 
 function play() {
+    //Init red ball on the board
     let redBall = document.createElement('span');
     redBall.id = "redBall";
     redBall.innerHTML = "a1";
     getDOM("a1").appendChild(redBall);
+
+    //Init blue ball on the board
+    let blueBall = document.createElement('span');
+    blueBall.id = "blueBall";
+    blueBall.innerHTML = "a6";
+    getDOM("a6").appendChild(blueBall);
+
+    // call key listener function
     getKey();
 }
 
@@ -18,7 +26,6 @@ function getKey() {
         switch (event.keyCode) {
             case 37:
                 move("stay", "red");
-                // move("stay", "blue");
                 break;
             case 38:
                 move("up", "red");
@@ -33,115 +40,184 @@ function getKey() {
      };
 }
 
-function move(to, flag) {
-    var valid = false;
-    if(flag == "red") {
+function checkAction(action, ballColor) {
+    var state;
+    if(ballColor == "red") {
+        state = redBall.innerHTML; // Get red ball state
+    }
+    else {
+        state = blueBall.innerHTML; // Get blue ball state
+    }
+    console.log("ball: " + ballColor + " is in: " + state)
 
-        console.log(to + " key is pressed.");
-        if(redBall.innerHTML == "a8") end();
-        if(to == "stay") {
-            valid = true;
-        } else if(to == "up") {
-            if(redBall.innerHTML[0] == 'a') {
+    switch (action) {
+        case "stay":
+            return true;
+        case "up":
+            if(state[0] == 'b') {
+                return true;
+            }
+            else {
                 console.log("can't go up");
-            } else moveUp();
-
-        } else if(to == "right") {
-
-            if(redBall.innerHTML[0] == "b") {
-                console.log("can't go right");
-            } else moveRight();
-
-        } else {
-
-            if(redBall.innerHTML[0] == "b") {
+            }
+            break;
+        case "right":
+            if(ballColor == "red") {
+                if(state[0] == "a") {
+                    return true;
+                } else {
+                    console.log("can't go right");
+                }
+            }
+            break;
+        case "down":
+            if(state[0] == "a") {
+                return true;
+            } else {
                 console.log("can't go down");
-            } else moveDown();
-
+            }
+            break;
+        case "left":
+            if(ballColor == "blue") {
+                if(state[0] == "a") {
+                    return true;
+                } else {
+                    console.log("can't go left");
+                }
+            }
+            break;
+    }
+    return false;
+}
+function move(to, ballColor) {
+    if(redState == "a6") end();
+    var validMove = checkAction(to, ballColor); //if operation is valid
+    var redState = redBall.innerHTML; // Get red ball state
+    if(validMove) {
+        switch (to) {
+            case "stay":
+                break;
+            case "up":
+                moveUp(ballColor);
+                break;
+            case "right":
+                if(ballColor == "red") {
+                    moveRight();
+                }
+                break;
+            case "down":
+                moveDown(ballColor);
+                break;
+            case "left":
+                if(ballColor == "blue") {
+                    moveDown();
+                }
+                break;
         }
-
-        if(redBall.innerHTML == "a1") console.log("on start");
-        
-
+        if(ballColor == "red") {
+            blueAction();
+        }
     }
-    
-    if(valid) {
-        
-    }
-
-    
 }
 
-function moveRight(flag) {
+function blueAction() {
+    var redState = redBall.innerHTML;
+    var blueState = blueBall.innerHTML;
 
-    if(flag == "red") {
-
-        var id = redBall.innerHTML;
-        var ballElement = redBall;
-        getDOM(id).innerHTML = "";
-        var num = parseInt(id[1]);
-        num++;
-        var newId =  "a" + num;
-        getDOM(newId).appendChild(ballElement);
-        ballElement.innerHTML = newId;
-        write("redBall", "move right");
-
-    } else {
-
+    actionsArray = [];
+    if(blueState != "a1") {
+        //check where blue ball can move
+        if(blueState[0] == 'a') {
+            // actionsArray = ["stay", "down", "left"];
+            actionsArray = ["down", "left"];
+        }
+        if(blueState[0] == "b") {
+            // actionsArray = ["stay","up"];
+            actionsArray = ["up"];
+        }
+        randomAction = actionsArray[actionsArray.length * Math.random() | 0];
+        makeAction = move(randomAction, "blue");
+        // while(!makeAction) {
+        //     randomAction = actionsArray[actionsArray.length * Math.random() | 0];
+        //     makeAction = move(randomAction, "blue");
+        // }
     }
-
-    
 }
 
-function moveUp(flag) {
+function moveRight() { //must be red ball (blue ball can't go right)
+    var redState = redBall.innerHTML;
+    var ballElement = redBall;
+    getDOM(redState).innerHTML = "";
+    var num = parseInt(redState[1]);
+    num++;
+    var newRedState =  "a" + num;
+    getDOM(newRedState).appendChild(ballElement);
+    ballElement.innerHTML = newRedState;
+    write("redBall", "move right");
+}
 
+function moveLeft() { //must be blue ball (red ball can't go right)
+    var blueState = blueBall.innerHTML;
+    var ballElement = blueBall;
+    getDOM(blueState).innerHTML = "";
+    var num = parseInt(blueState[1]);
+    num++;
+    var newBlueState =  "a" + num;
+    getDOM(newBlueState).appendChild(ballElement);
+    ballElement.innerHTML = newBlueState;
+    write("blueBall", "move left");
+}
 
-    if(flag == "red") {
-
-        var id = redBall.innerHTML;
+function moveUp(ballColor) {
+    if(ballColor == "red") {
+        var redState = redBall.innerHTML;
         var ballElement = redBall;
-        getDOM(id).innerHTML = "";
-        var num = parseInt(id[1]);
-        var newId =  "a" + num;
-        getDOM(newId).appendChild(ballElement);
-        ballElement.innerHTML = newId;
+        getDOM(redState).innerHTML = "";
+        var num = parseInt(redState[1]);
+        var newRedState =  "a" + num;
+        getDOM(newRedState).appendChild(ballElement);
+        ballElement.innerHTML = newRedState;
         write("redBall", "move up");
-
     } else {
-        
+        var blueState = redBall.innerHTML;
+        var ballElement = blueBall;
+        getDOM(blueState).innerHTML = "";
+        var num = parseInt(blueState[1]);
+        var newBlueState =  "a" + num;
+        getDOM(newBlueState).appendChild(ballElement);
+        ballElement.innerHTML = newBlueState;
+        write("blueBall", "move up");
     }
-
-    
-    
 }
 
-function moveDown(flag) {
-
-    if(flag == "red") {
-
-        var id = redBall.innerHTML;
+function moveDown(ballColor) {
+    if(ballColor == "red") {
+        var redState = redBall.innerHTML;
         var ballElement = redBall;
-        getDOM(id).innerHTML = "";
-        var num = parseInt(id[1]);
-        var newId =  "b" + num;
-        getDOM(newId).appendChild(ballElement);
-        ballElement.innerHTML = newId;
+        getDOM(redState).innerHTML = "";
+        var num = parseInt(redState[1]);
+        var newRedState =  "b" + num;
+        getDOM(newRedState).appendChild(ballElement);
+        ballElement.innerHTML = newRedState;
         write("redBall", "move down");
-
     } else {
-
+        var blueState = blueBall.innerHTML;
+        var ballElement = blueBall;
+        getDOM(blueState).innerHTML = "";
+        var num = parseInt(blueState[1]);
+        var newBlueState =  "b" + num;
+        getDOM(newBlueState).appendChild(ballElement);
+        ballElement.innerHTML = newBlueState;
+        write("blueBall", "move down");
     }
-
-    
-
 }
 
 function end() {
     getDOM("panel").innerHTML += "end game";
 }
 
-function write(id, command) {
+function write(redState, command) {
     console.log(redBall.innerHTML);
     redCounterSteps++;
-    getDOM("panel").innerHTML += redCounterSteps + ". " + id + " move to: " + redBall.innerHTML + " command: " + command + "<br>";
+    getDOM("panel").innerHTML += redCounterSteps + ". " + redState + " move to: " + redBall.innerHTML + " command: " + command + "<br>";
 }
