@@ -1,3 +1,8 @@
+//
+// Author: Ido Shapira
+// date: 07/03/2021
+//
+//---------------- global variables------------------------------
 let redCounterSteps = 0;
 let blueCounterSteps = 0;
 let postID;
@@ -6,25 +11,49 @@ let win = true;
 let redLastCommand;
 let blueLastCommand;
 
+let redBall;
+let blueBall;
+// ---------------helper functions-------------------------------
 function getDOM(id) {
     return document.getElementById(id);
-} 
-
+}
+function getRedState(){
+    return redBall.innerHTML
+}
+function getBlueState(){
+    return blueBall.innerHTML
+}
+function setRedState(newState){
+    redBall.innerHTML = newState;
+}
+function setBlueState(newState){
+    blueBall.innerHTML = newState
+}
+// ---------------main code--------------------------------------
 function play() {
+
     //Init red ball on the board
-    let redBall = document.createElement('span');
+    redBall = document.createElement('span');
     redBall.id = "redBall";
-    redBall.innerHTML = "a1";
+    setRedState("a1");
     getDOM("a1").appendChild(redBall);
 
     //Init blue ball on the board
-    let blueBall = document.createElement('span');
+    blueBall = document.createElement('span');
     blueBall.id = "blueBall";
-    blueBall.innerHTML = "a6";
+    setBlueState("a6");
     getDOM("a6").appendChild(blueBall);
 
     // call key listener function
     getKey();
+
+    alert("welcom! game instructions:\n\n"+
+    "The goal is to reach the other side without colliding with the red dot, (where in the beginning is the red dot).\n\n"+
+    "Use the arrows on the keyboard to move forward.\n\n"+
+    "It is possible to stay in place by clicking on the left.\n\n"+
+    "It is not possible to advance to the right if you are in the bottom slots.\n\n"+
+    "It is not possible to return back.\n\n"+
+    "good luck!");
 }
 
 function getKey() {
@@ -49,10 +78,10 @@ function getKey() {
 function checkAction(action, ballColor) {
     var state;
     if(ballColor == "red") {
-        state = redBall.innerHTML; // Get red ball state
+        state = getRedState(); // Get red ball state
     }
     else {
-        state = blueBall.innerHTML; // Get blue ball state
+        state = getBlueState(); // Get blue ball state
     }
     console.log("ball: " + ballColor + " is in: " + state)
 
@@ -96,8 +125,7 @@ function checkAction(action, ballColor) {
     return false;
 }
 function redMove(to) {
-    var redState = redBall.innerHTML; // Get red ball state
-    if(redState == "a6") {
+    if(getRedState() == "a6") {
         alert("you won! \nYou can do another try.");
         win = true;
         finishGame();
@@ -119,21 +147,21 @@ function redMove(to) {
                 break;
         }
         blueMove();
-    }
-    if(cheackIfLoss()) {
-        alert("you loss! \nYou collided with the blue ball.\ntry again.");
-        win = false;
-        finishGame();
+        if(cheackIfLoss()) {
+            alert("you loss! \nYou collided with the blue ball.\ntry again.");
+            win = false;
+            finishGame();
+        }
     }
 }
 
 function blueMove() { //make random action
-    var blueState = blueBall.innerHTML; // Get blue ball state
-    var redState = redBall.innerHTML; // Get blue ball state
+    var blueState = getBlueState(); // Get blue ball state
+    var redState = getRedState(); // Get blue ball state
     
     var actionsArray;
     if(parseInt(redState[1]) == parseInt(blueState[1])) {
-        actionsArray = ["left"];
+        actionsArray = ["left","up"];
     } else if(blueState == "a1") {
         actionsArray = ["stay"]; //blueBall has reached to destination
     } else {
@@ -159,6 +187,14 @@ function blueMove() { //make random action
     }
 }
 
+function cheackIfLoss() { //if red and blue ball in the same position
+    redState = getRedState(); // Get red ball state
+    blueState = getBlueState(); // Get red ball state
+
+    return ((redLastCommand == "right") && (blueLastCommand == "left") &&
+    (parseInt(redState[1])-1 == parseInt(blueState[1])) || (redState == blueState)); 
+}
+
 function moveOnboard(currentPosition, newPosition, color) {
     var ballElement;
     if(color == "red") {
@@ -173,7 +209,7 @@ function moveOnboard(currentPosition, newPosition, color) {
 }
 
 function moveRight() { //must be red ball (blue ball can't go right)
-    var redState = redBall.innerHTML;
+    var redState = getRedState();
     var num = parseInt(redState[1]);
     num++;
     var newRedState =  "a" + num;
@@ -182,7 +218,7 @@ function moveRight() { //must be red ball (blue ball can't go right)
 }
 
 function moveLeft() { //must be blue ball (red ball can't go right)
-    var blueState = blueBall.innerHTML;
+    var blueState = getBlueState();
     var num = parseInt(blueState[1]);
     num--;
     var newBlueState =  "a" + num;
@@ -194,12 +230,11 @@ function moveUp(ballColor) {
     var currentPosition;
     var newPosition;
     if(ballColor == "red") {
-        currentPosition = redBall.innerHTML;
-        saveActionToFirebase("up", "red");
+        currentPosition = getRedState();
     } else { //color == "blue"
-        currentPosition = blueBall.innerHTML;
-        saveActionToFirebase("up", "blue");
+        currentPosition = getBlueState();
     }
+    saveActionToFirebase("up", ballColor);
     newPosition =  "a" + parseInt(currentPosition[1]);
     moveOnboard(currentPosition, newPosition, ballColor);
 }
@@ -208,27 +243,13 @@ function moveDown(ballColor) {
     var currentPosition;
     var newPosition;
     if(ballColor == "red") {
-        currentPosition = redBall.innerHTML;
-        saveActionToFirebase("down", "red");
+        currentPosition = getRedState();
     } else { //color == "blue"
-        currentPosition = blueBall.innerHTML;
-        saveActionToFirebase("down", "blue");
+        currentPosition = getBlueState();
     }
+    saveActionToFirebase("down", ballColor);
     newPosition =  "b" + parseInt(currentPosition[1]);
     moveOnboard(currentPosition, newPosition, ballColor);
-}
-
-function cheackIfLoss() { //if red and blue ball in the same position
-    redState = redBall.innerHTML; // Get red ball state
-    blueState = blueBall.innerHTML; // Get red ball state
-
-    console.log("redLastCommand: "+ redLastCommand + ",blueLastCommand: "+ blueLastCommand);
-    console.log("redState[1]: "+ redState[1] +",blueState[1]: "+ redState[1]);
-    console.log((redLastCommand == "right") && (blueLastCommand == "left") &&
-    (parseInt(redState[1])+1 == parseInt(blueState[1])) && (redState == blueState));
-
-    return ((redLastCommand == "right") && (blueLastCommand == "left") &&
-    (parseInt(redState[1])-1 == parseInt(blueState[1])) || (redState == blueState)); 
 }
 
 function finishGame() { //update database
@@ -262,15 +283,15 @@ function saveActionToFirebase(command, color) {
     if(color == "red") {
         redCounterSteps++;
         redLastCommand = command;
-        getDOM("panel").innerHTML += redCounterSteps + ". " + redBall.id + " move to: " + redBall.innerHTML + " command: " + command + "<br>";
+        getDOM("panel").innerHTML += redCounterSteps + ". " + redBall.id + " move to: " + getRedState() + " command: " + command + "<br>";
     }
     else {
         blueCounterSteps++;
         blueLastCommand = command
-        getDOM("panel").innerHTML += blueCounterSteps + ". " + blueBall.id + " move to: " + blueBall.innerHTML + " command: " + command + "<br>";
+        getDOM("panel").innerHTML += blueCounterSteps + ". " + blueBall.id + " move to: " + getBlueState() + " command: " + command + "<br>";
         firebase.database().ref("games/"+postID+"/"+blueCounterSteps).set({
-            "blue": blueBall.id + " move to: " + blueBall.innerHTML+", command: " + blueLastCommand,
-            "red": redBall.id + " move to: " + redBall.innerHTML +", command: " + redLastCommand
+            "blue": blueBall.id + " move to: " + getBlueState() +", command: " + blueLastCommand,
+            "red": redBall.id + " move to: " + getRedState() +", command: " + redLastCommand
         })
     }
 }
