@@ -48,7 +48,7 @@ function play() {
     getKey();
 
     alert("welcom! game instructions:\n\n"+
-    "The goal is to reach the other side without colliding with the red dot, (where in the beginning is the red dot).\n\n"+
+    "The goal is to reach the other side without colliding with the red dot in a minimum of steps, (where in the beginning is the red dot).\n\n"+
     "Use the arrows on the keyboard to move forward.\n\n"+
     "It is possible to stay in place by clicking on the left.\n\n"+
     "It is not possible to advance to the right if you are in the bottom slots.\n\n"+
@@ -126,7 +126,10 @@ function checkAction(action, ballColor) {
 }
 function redMove(to) {
     if(getRedState() == "a6") {
-        alert("you won! \nYou can do another try.");
+        alert("Well done, you reached your destination safely!\n"+
+            "You have reached a "+redCounterSteps+" steps."+
+            "\nThe goal is to reach as few as possible.\n"+
+            "To try again refresh the screen.");
         win = true;
         finishGame();
     }
@@ -284,6 +287,7 @@ function saveActionToFirebase(command, color) {
         redCounterSteps++;
         redLastCommand = command;
         getDOM("panel").innerHTML += redCounterSteps + ". " + redBall.id + " move to: " + getRedState() + " command: " + command + "<br>";
+        getDOM("steps").innerHTML = "Steps: "+ redCounterSteps;
     }
     else {
         blueCounterSteps++;
