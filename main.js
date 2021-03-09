@@ -14,6 +14,7 @@ let blueLastCommand;
 
 let redBall;
 let blueBall;
+let chooseBehavior;
 
 //To calculate the score:
 const crushing = -100;
@@ -57,12 +58,18 @@ function play() {
     setBlueState("a6");
     getDOM("a6").appendChild(blueBall);
 
+    algorithms = ["carefulBehavior",
+                  "aggressiveBehavior",
+                  "semiAggressiveBehavior"];
+    selectedBehavior = algorithms[algorithms.length * Math.random() | 0];
+    console.log("Blue behavior: "+ selectedBehavior)
+
     // call key listener function
     getKey();
 
     alert("welcom! game instructions:\n\n"+
     "The goal is to reach the other side without colliding with the red dot in a minimum of steps, (where in the beginning is the red dot).\n\n"+
-    "Use the arrows on the keyboard to move forward.\n\n"+
+    "Use the arrows on the keyboard or the cursor to move forward.\n\n"+
     "It is possible to stay in place by clicking on the left.\n\n"+
     "It is not possible to advance to the right if you are in the bottom slots.\n\n"+
     "It is not possible to return back.\n\n"+
@@ -73,20 +80,35 @@ function getKey() {
     document.onkeydown = function (event) {
         switch (event.keyCode) {
             case 37:
-                redMove("stay", "red");
+                redMove("stay");
                 break;
             case 38:
-                redMove("up", "red");
+                redMove("up");
                 break;
             case 39:
-                redMove("right", "red");
+                redMove("right");
                 break;
             case 40:
-                redMove("down", "red");
+                redMove("down");
                 break;
         }
      };
 }
+
+function moveUsingCursor(cell){
+    var redState = getRedState();
+    console.log("cell.id: "+cell.id);
+    if(redState == cell.id) {
+        redMove("stay");
+    } else if(redState[0] == "a" && redState[1] == cell.id[1] && cell.id[0] == "b") {
+        redMove("down");
+    } else if(redState[0] == "b" && redState[1] == cell.id[1] && cell.id[0] == "a") {
+        redMove("up");
+    } else if(redState[0] == "a" && parseInt(redState[1])+1 == parseInt(cell.id[1]) && cell.id[0] == "a") {
+        redMove("right");
+    }
+}
+
 
 function checkAction(action, ballColor) {
     var state;
@@ -174,24 +196,46 @@ function redMove(to) {
     }
 }
 function blueMove() {
-    algorithms = ["carefulAlgorithm"]
-    var chooseAlgo = algorithms[algorithms.length * Math.random() | 0];
     var blueState = getBlueState(); // Get blue ball state
     var redState = getRedState(); // Get blue ball state
-    switch (chooseAlgo) {
-        case "randomAlgorithm":
-            randomAlgorithm(blueState, redState);
+    switch (selectedBehavior) {
+        case "carefulBehavior": // Moves towards the player and then moves down and waits until the player passes.
+            carefulBehavior(blueState, redState);
             break;
-        case "carefulAlgorithm":
-            carefulAlgorithm(blueState, redState);
+        case "aggressiveBehavior": // Just moves right
+            aggressiveBehavior(blueState, redState);
+            break;
+        case "semiAggressiveBehavior": // Moves left unless the other car is there, in which case it stays in place until the other car moves out of its way.
+            semiAggressiveBehavior(blueState, redState);
             break;
     }
 }
 
+function semiAggressiveBehavior(blueState, redState) {
+    if(blueState == "a1") {
+        moveStay("blue");
+    } else if(parseInt(redState[1])+1 < parseInt(blueState[1]) || redState[0] == "b"){
+        moveLeft();
+    } else if(parseInt(redState[1]) > parseInt(blueState[1])) {
+        moveLeft();
+    }
+    else {
+        moveStay("blue");
+    }
+}
+
+function aggressiveBehavior(blueState, redState){
+    if(blueState == "a1") {
+        moveStay("blue");
+    } else {
+        moveLeft();
+    }
+}
+
+
 let wasmoveUp = false;
 let wasmoveDown = false;
-function carefulAlgorithm(blueState, redState) {
-    
+function carefulBehavior(blueState, redState) {
     if(blueState == "a1") {
         moveStay("blue");
     } else if(parseInt(redState[1])+1 < parseInt(blueState[1])){
@@ -216,34 +260,34 @@ function carefulAlgorithm(blueState, redState) {
     }
 }
  
-function randomAlgorithm(blueState, redState) { //make random action
-    var actionsArray;
-    if(parseInt(redState[1]) == parseInt(blueState[1])) {
-        actionsArray = ["left","up"];
-    } else if(blueState == "a1") {
-        actionsArray = ["stay"]; //blueBall has reached to destination
-    } else {
-        actionsArray = ["stay", "down", "up", "left"];
-    }
-    var randomAction = actionsArray[actionsArray.length * Math.random() | 0];
-    while(!checkAction(randomAction, "blue")) { //find valid action 
-        randomAction = actionsArray[actionsArray.length * Math.random() | 0];
-    }
-    switch (randomAction) {
-        case "stay":
-            moveStay("blue")
-            break;
-        case "up":
-            moveUp("blue");
-            break;
-        case "down":
-            moveDown("blue");
-            break;
-        case "left":
-            moveLeft();
-            break;
-    }
-}
+// function randomAlgorithm(blueState, redState) { //make random action
+//     var actionsArray;
+//     if(parseInt(redState[1]) == parseInt(blueState[1])) {
+//         actionsArray = ["left","up"];
+//     } else if(blueState == "a1") {
+//         actionsArray = ["stay"]; //blueBall has reached to destination
+//     } else {
+//         actionsArray = ["stay", "down", "up", "left"];
+//     }
+//     var randomAction = actionsArray[actionsArray.length * Math.random() | 0];
+//     while(!checkAction(randomAction, "blue")) { //find valid action 
+//         randomAction = actionsArray[actionsArray.length * Math.random() | 0];
+//     }
+//     switch (randomAction) {
+//         case "stay":
+//             moveStay("blue")
+//             break;
+//         case "up":
+//             moveUp("blue");
+//             break;
+//         case "down":
+//             moveDown("blue");
+//             break;
+//         case "left":
+//             moveLeft();
+//             break;
+//     }
+// }
 
 function cheackIfLoss() { //if red and blue ball in the same position
     redState = getRedState(); // Get red ball state
@@ -327,6 +371,7 @@ function reset() {
     
     redLastCommand = null;
     blueLastCommand = null;
+    selectedBehavior = null;
 
     wasmoveUp = false;
     wasmoveDown = false;

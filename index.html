@@ -20,20 +20,20 @@
     <main class="main">
         <table class="board">
             <tr>
-                <td id="a1"></td>
-                <td id="a2"></td>
-                <td id="a3"></td>
-                <td id="a4"></td>
-                <td id="a5"></td>
-                <td id="a6"></td>
+                <td id="a1" onclick="moveUsingCursor(this);"></td>
+                <td id="a2" onclick="moveUsingCursor(this);"></td>
+                <td id="a3" onclick="moveUsingCursor(this);"></td>
+                <td id="a4" onclick="moveUsingCursor(this);"></td>
+                <td id="a5" onclick="moveUsingCursor(this);"></td>
+                <td id="a6" onclick="moveUsingCursor(this);"></td>
             </tr>
             <tr>
-                <td id="b1" class='selRight'></td>
-                <td id="b2" class='selRight'></td>
-                <td id="b3" class='selRight'></td>
-                <td id="b4" class='selRight'></td>
-                <td id="b5" class='selRight'></td>
-                <td id="b6"></td>
+                <td id="b1" class='selRight' onclick="moveUsingCursor(this);"></td>
+                <td id="b2" class='selRight' onclick="moveUsingCursor(this);"></td>
+                <td id="b3" class='selRight' onclick="moveUsingCursor(this);"></td>
+                <td id="b4" class='selRight' onclick="moveUsingCursor(this);"></td>
+                <td id="b5" class='selRight' onclick="moveUsingCursor(this);"></td>
+                <td id="b6" onclick="moveUsingCursor(this);"></td>
             </tr>
         </table>
     </main>
@@ -45,7 +45,7 @@
     </table>
     <div class="panel" id="panel"><br>
         The goal is to reach the other side without colliding with the red dot in a minimum of steps, (where in the beginning is the red dot).<br><br>
-        Use the arrows on the keyboard to move forward.<br><br>
+        Use the arrows on the keyboard or the cursor to move forward.<br><br>
         It is possible to stay in place by clicking on the left.<br><br>
         It is not possible to advance to the right if you are in the bottom slots.<br><br>
         It is not possible to return back.<br><br>
