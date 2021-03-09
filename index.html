@@ -11,13 +11,14 @@
     <script src="main.js"></script>
 
 </head>
-<body onload="play(); initializeFirebase();">
+<body onload="initializeFirebase(); play();">
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-database.js"></script>
 
+    <button class="button" id="playagain" onclick="clickPlayagain()" style="float: left;">Play again</button>
     <main class="main">
-        <table>
+        <table class="board">
             <tr>
                 <td id="a1"></td>
                 <td id="a2"></td>
@@ -27,16 +28,21 @@
                 <td id="a6"></td>
             </tr>
             <tr>
-                <td id="b1"></td>
-                <td id="b2"></td>
-                <td id="b3"></td>
-                <td id="b4"></td>
-                <td id="b5"></td>
+                <td id="b1" class='selRight'></td>
+                <td id="b2" class='selRight'></td>
+                <td id="b3" class='selRight'></td>
+                <td id="b4" class='selRight'></td>
+                <td id="b5" class='selRight'></td>
                 <td id="b6"></td>
             </tr>
         </table>
     </main>
-    <p id="steps">Steps: 0</p>
+    <table>
+        <tr>
+            <td id="steps">Steps: 0</td>
+            <td id="score">Score: 10</td>
+        </tr>
+    </table>
     <div class="panel" id="panel"><br>
         The goal is to reach the other side without colliding with the red dot in a minimum of steps, (where in the beginning is the red dot).<br><br>
         Use the arrows on the keyboard to move forward.<br><br>

@@ -3,11 +3,9 @@
     transition: 200ms;
 }
 
-table, th, td {
-    border: 1px solid black;
-}
-
-table {
+.board {
+    border-collapse: collapse;
+    border: 4px solid black;
     width: 80%;
     height: 100%;
     margin-left: auto; 
@@ -15,13 +13,34 @@ table {
     margin-top: 5%;
 }
 
-td {
-    padding: 30px;
+table, td, th, tr {
+    padding: 20px;
 }
+
+.selRight {
+    border-right: 4px solid black;
+}
+
+.button {
+    background-color: #f4511e;
+    border: none;
+    color: white;
+    padding: 16px 32px;
+    text-align: center;
+    font-size: 16px;
+    margin: 4px 2px;
+    opacity: 0.6;
+    transition: 0.3s;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .button:hover {opacity: 1}
 
 #redBall {
     background-color: red;
-    border-radius: 50%;
+    border-radius: 100%;
     width: 10px;
     height: 10px;
     color: red;
@@ -29,7 +48,7 @@ td {
 
 #blueBall {
     background-color: blue;
-    border-radius: 50%;
+    border-radius: 100%;
     width: 10px;
     height: 10px;
     color: blue;
